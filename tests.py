@@ -1,7 +1,7 @@
 import unittest
 
 from search import search
-from regex import telgram_token_regex
+from regex import telegram_token_regex
 
 
 class TestRepository(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestRepository(unittest.TestCase):
     pass
 
 
-class TestRegex(unitest.TestCase):
+class TestRegex(unittest.TestCase):
     '''Test regexes'''
 
     def test_telegram_token_regex_matches(self):
@@ -32,3 +32,7 @@ class TestRepositorySearch(unittest.TestCase):
         result = search(q='Telegram', sort='updated', order='asc')
 
         self.assertNotEqual(len(result), 0)
+
+
+if __name__ == "__main__":
+    unittest.main()
