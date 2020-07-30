@@ -21,11 +21,10 @@ def search(q=None, sort=None, order=None):
 
     if response.status_code != 200:
         raise Exception(
-            f'''GitHub API returned not succes code: {response.status_code}
-
-----
-{response.content}
-----'''
+            f"GitHub API returned not succes code: {response.status_code}"
+            "----"
+            f"{response.content}"
+            "----"
             )
 
     result = response.json()
