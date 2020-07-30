@@ -1,5 +1,7 @@
 import requests
 
+from repository import Repository
+
 
 github_api_url = "https://api.github.com"
 
@@ -32,7 +34,7 @@ def search(q=None, sort=None, order=None):
     repos = []
     
     for item in result['items']:
-        repos.append(item['url'])
+        repos.append(Repository(item['url']))
 
     return repos
     

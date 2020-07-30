@@ -2,11 +2,20 @@ import unittest
 
 from search import search
 from regex import telegram_token_regex
+from repository import Repository
 
 
 class TestRepository(unittest.TestCase):
     '''Test repository scanner'''
-    pass
+
+    def test_repository_creates_from_url(self):
+        '''Test: repository creates from url'''
+        repo = Repository(url="https://github.com/octocat/Hello-World")
+
+        self.assertIsNotNone(repo)
+        self.assertEqual(repo.owner, 'octocat')
+        self.assertEqual(repo.name, 'Hello-World')
+        self.assertEqual(repo.api_url, 'https://api.github.com/repos/octocat/Hello-World')
 
 
 class TestRegex(unittest.TestCase):
@@ -54,6 +63,13 @@ class TestRepositorySearch(unittest.TestCase):
         result = search(q='aldf908dsfhnhuyn9qc60qcinyr9c')
 
         self.assertEqual(len(result), 0)
+
+    def test_search_returns_repositories(self):
+        '''Test: search returns list of Repository objects'''
+        result = search(q='Telegram')
+
+        for repo in result:
+            self.assertEqual(type(repo), Repository)
 
 
 if __name__ == "__main__":
