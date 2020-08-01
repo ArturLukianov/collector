@@ -15,21 +15,35 @@ class TestGitHubAPI(unittest.TestCase):
         '''Test: get and post requests to GitHub API'''
         api = GitHubAPI()
 
-        response = api.get("/rate_limit")
-
-        if response.status_code != 200:
-            self.fail("Response status code is not successful")
-
-        rate = response.json().get('rate')
+        result = api.get("/rate_limit")
+        
+        rate = result.get('rate')
         self.assertIsNotNone(rate)
+
+    def test_can_load_credentials(self):
+        '''Test: can load credentials from file'''
+        api = GitHubAPI()
+
+        api.load_credentials("credentials.json")
+
+        self.assertIsNotNone(api.username)
+        self.assertIsNotNone(api.password)
 
     def test_github_authentication(self):
         '''Test: GitHub API client can authenticate on server'''
         api = GitHubAPI()
 
-        username, password = api.load_credentials()
+        api.load_credentials("credentials.json")
+        api.authenticate()
 
-        api.authenticate(username=username, password=password)
+        result = api.get("/rate_limit")
+
+        rate = result.get('rate')
+        self.assertIsNotNone(rate)
+
+        rate_limit = rate.get('limit')
+        self.assertIsNotNone(rate_limit)
+        self.assertNotEqual(rate_limit, 60)
     
 
 class TestRepository(unittest.TestCase):
