@@ -135,24 +135,40 @@ class TestRegex(unittest.TestCase):
         for invalid_token in invalid_tokens:
             self.assertIsNone(telegram_token_regex.match(invalid_token))
 
+    def test_telgram_token_regex_search(self):
+        '''Test: find tokens in text'''
+        texts = [
+            ('TOKEN = 1169639777:AAFdGx-nzjj67VjVsUOtqiE_-rzQSax2CBw',
+             ['1169639777:AAFdGx-nzjj67VjVsUOtqiE_-rzQSax2CBw'])
+        ]
+
+        for text, tokens in texts:
+            self.assertEqual(telegram_token_regex.findall(text), tokens)
+
 class TestRepositorySearch(unittest.TestCase):
     '''Test GitHub repository searcher'''
 
+    def setUp(self):
+        '''Initialization'''
+        self.api = GitHubAPI()
+        self.api.load_credentials('credentials.json')
+        self.api.authenticate()
+
     def test_search_returns_not_empty_list(self):
         '''Test: search and find something'''
-        result = search(q='Telegram', sort='updated', order='asc')
+        result = search(q='Telegram', sort='updated', order='asc', api=self.api)
 
         self.assertNotEqual(len(result), 0)
 
     def test_search_returns_empty_list(self):
         '''Test: search returns empty list for bad query'''
-        result = search(q='aldf908dsfhnhuyn9qc60qcinyr9c')
+        result = search(q='aldf908dsfhnhuyn9qc60qcinyr9c', api=self.api)
 
         self.assertEqual(len(result), 0)
 
     def test_search_returns_repositories(self):
         '''Test: search returns list of Repository objects'''
-        result = search(q='Telegram')
+        result = search(q='Telegram', api=self.api)
 
         for repo in result:
             self.assertEqual(type(repo), Repository)

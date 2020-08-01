@@ -6,6 +6,8 @@ from regex import telegram_token_regex
 from githubapi import GitHubAPI
 
 credentials_file = "credentials.json"
+save_file = "tg_tokens.txt"
+
 query = "Telegram"
 regex = telegram_token_regex
 
@@ -35,7 +37,16 @@ for repo in repositories:
         files = commit.get_files()
         for file_ in files:
             print("File", file_.filename)
-            results = regex.search(file_.read())
-            if results is not None:
-                print(results)
-                input()
+            results = regex.findall(file_.read())
+            gathered += results
+            if len(results) != 0:
+                print('Found', len(results), 'potential tokens!')
+
+print('-- Gathered info --')
+print("\n".join(gathered))
+print('-- END --')
+
+with open(save_file, "w") as f:
+    f.write("\n".join(gathered))
+
+print('Saved to', save_file)
