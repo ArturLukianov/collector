@@ -49,18 +49,24 @@ class TestGitHubAPI(unittest.TestCase):
 class TestRepository(unittest.TestCase):
     '''Test repository scanner'''
 
+    def setUp(self):
+        '''Initialize'''
+        self.api = GitHubAPI()
+        self.api.load_credentials('credentials.json')
+        self.api.authenticate()
+
     def test_repository_creates_from_url(self):
         '''Test: repository creates from url'''
-        repo = Repository(url="https://github.com/octocat/Hello-World")
+        repo = Repository(api=self.api, url="https://github.com/octocat/Hello-World")
 
         self.assertIsNotNone(repo)
         self.assertEqual(repo.owner, 'octocat')
         self.assertEqual(repo.name, 'Hello-World')
-        self.assertEqual(repo.api_url, 'https://api.github.com/repos/octocat/Hello-World')
+        self.assertEqual(repo.api_method, '/repos/octocat/Hello-World')
 
     def test_repository_can_get_commits(self):
         '''Test: can get commits from repository'''
-        repo = Repository(url="https://github.com/octocat/Hello-World")
+        repo = Repository(api=self.api, url="https://github.com/octocat/Hello-World")
 
         commits = repo.get_commits()
 
@@ -73,8 +79,15 @@ class TestRepository(unittest.TestCase):
 class TestCommit(unittest.TestCase):
     '''Test commits'''
 
+    def setUp(self):
+        '''Initialization'''
+        self.api = GitHubAPI()
+        self.api.load_credentials("credentials.json")
+        self.api.authenticate()
+
     def test_commit_get_files(self):
-        repo = Repository(url="https://github.com/octocat/Hello-World")
+        '''Test: can retreive commit files'''
+        repo = Repository(url="https://github.com/octocat/Hello-World", api=self.api)
         commits = repo.get_commits()
 
         files = commits[0].get_files()

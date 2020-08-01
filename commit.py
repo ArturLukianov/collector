@@ -1,34 +1,33 @@
 import requests
 from file import File
+from githubapi import GitHubAPI
 
 
 class Commit:
     '''Commit made to repository'''
 
-    def __init__(self, repo, sha):
+    def __init__(self, repo, sha, api=None):
         '''Initialize commit'''
         self.repo = repo
         self.sha = sha
-        self.url = self.repo.api_url + '/commits/' + sha
+        self.api_method = self.repo.api_method + '/commits/' + sha
 
+        if api is None:
+            self.api = GitHubAPI()
+        else:
+            self.api = api
+        
         self.init_info()
 
     def init_info(self):
         '''Fetch primary info from GitHub'''
-        response = requests.get(self.url)
-
-        if response.status_code != 200:
-            raise Exception("GitHub API returned not succesful status code")
-
-        result = response.json()
+        result = self.api.get(self.api_method)
 
         self.message = result['commit']['message']
 
     def get_files(self):
         '''Fetch files associated with commit'''
-        response = requests.get(self.url)
-
-        result = response.json()
+        result = self.api.get(self.api_method)
 
         files = []
 

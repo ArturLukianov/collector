@@ -1,16 +1,14 @@
 import requests
 from urllib.parse import urlparse
 
+from githubapi import GitHubAPI
 from commit import Commit
-
-
-github_api_url = "https://api.github.com"
 
 
 class Repository:
     '''GitHub repository'''
 
-    def __init__(self, url=None):
+    def __init__(self, url=None, api=None):
         '''Initialize repository'''
         if url is None:
             raise Exception("GitHub repository needs url to create")
@@ -22,20 +20,20 @@ class Repository:
         self.owner = path[1]
         self.name = path[2]
 
-        self.api_url = github_api_url + "/repos" + urlparse(url).path
+        if api is None:
+            self.api = GitHubAPI()
+        else:
+            self.api = api
+
+        self.api_method = "/repos" + urlparse(url).path
 
     def get_commits(self):
         '''Get all commits made to repository'''
-        response = requests.get(self.api_url + '/commits')
-
-        if response.status_code != 200:
-            raise Exception("GitHub API returned not sucessful status code")
-
-        result = response.json()
+        result = self.api.get(self.api_method + '/commits')
 
         commits = []
 
         for commit in result:
-            commits.append(Commit(repo=self, sha=commit['sha']))
+            commits.append(Commit(repo=self, sha=commit['sha'], api=self.api))
 
         return commits
