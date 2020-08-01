@@ -18,7 +18,11 @@ class File:
 
         response = requests.get(self.raw_url)
 
-        self.contents = response.content.decode("utf8")
+        self.contents = response.content
+        try:
+            self.contents = self.contents.decode('utf8')
+        except UnicodeError:
+            self.contents = ''
 
         return self.contents
         
