@@ -3,7 +3,34 @@ import unittest
 from search import search
 from regex import telegram_token_regex
 from repository import Repository
+from commit import Commit
+from file import File
+from githubapi import GitHubAPI
 
+
+class TestGitHubAPI(unittest.TestCase):
+    '''Test GitHub API client'''
+
+    def test_get_requests(self):
+        '''Test: get and post requests to GitHub API'''
+        api = GitHubAPI()
+
+        response = api.get("/rate_limit")
+
+        if response.status_code != 200:
+            self.fail("Response status code is not successful")
+
+        rate = response.json().get('rate')
+        self.assertIsNotNone(rate)
+
+    def test_github_authentication(self):
+        '''Test: GitHub API client can authenticate on server'''
+        api = GitHubAPI()
+
+        username, password = api.load_credentials()
+
+        api.authenticate(username=username, password=password)
+    
 
 class TestRepository(unittest.TestCase):
     '''Test repository scanner'''
@@ -17,6 +44,38 @@ class TestRepository(unittest.TestCase):
         self.assertEqual(repo.name, 'Hello-World')
         self.assertEqual(repo.api_url, 'https://api.github.com/repos/octocat/Hello-World')
 
+    def test_repository_can_get_commits(self):
+        '''Test: can get commits from repository'''
+        repo = Repository(url="https://github.com/octocat/Hello-World")
+
+        commits = repo.get_commits()
+
+        self.assertNotEqual(len(commits), 0)
+
+        for commit in commits:
+            self.assertEqual(type(commit), Commit)
+
+
+class TestCommit(unittest.TestCase):
+    '''Test commits'''
+
+    def test_commit_get_files(self):
+        repo = Repository(url="https://github.com/octocat/Hello-World")
+        commits = repo.get_commits()
+
+        files = commits[0].get_files()
+
+        self.assertNotEqual(len(files), 0)
+
+        for file_ in files:
+            self.assertEqual(type(file_), File)
+
+
+class TestFile(unittest.TestCase):
+    '''Test files attached to commits'''
+
+    pass
+            
 
 class TestRegex(unittest.TestCase):
     '''Test regexes'''

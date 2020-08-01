@@ -34,7 +34,7 @@ def search(q=None, sort=None, order=None):
     repos = []
     
     for item in result['items']:
-        repos.append(Repository(item['url']))
+        repos.append(Repository(item['html_url']))
 
     return repos
     
