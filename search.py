@@ -1,14 +1,15 @@
 import requests
 
 from repository import Repository
+from githubapi import GitHubAPI
 
 
-github_api_url = "https://api.github.com"
-
-
-def search(q=None, sort=None, order=None):
+def search(q=None, sort=None, order=None, api=None):
     '''Search github repos for query'''
     method = "/search/repositories"
+
+    if api is None:
+        api = GitHubAPI()
 
     data = dict()
 
@@ -16,25 +17,12 @@ def search(q=None, sort=None, order=None):
     if sort is not None: data['sort'] = sort
     if order is not None: data['order'] = order
 
-    response = requests.get(
-        github_api_url + method,
-        params=data
-    )
-
-    if response.status_code != 200:
-        raise Exception(
-            f"GitHub API returned not succes code: {response.status_code}"
-            "----"
-            f"{response.content}"
-            "----"
-            )
-
-    result = response.json()
+    result = api.get(method, params=data)
 
     repos = []
     
     for item in result['items']:
-        repos.append(Repository(item['html_url']))
+        repos.append(Repository(item['html_url'], api=api))
 
     return repos
     

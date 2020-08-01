@@ -3,17 +3,25 @@
 from repository import Repository
 from search import search
 from regex import telegram_token_regex
+from githubapi import GitHubAPI
 
+credentials_file = "credentials.json"
+query = "Telegram"
+regex = telegram_token_regex
 
 print("-- [GitHub scanner] --", end="\n\n")
 
-query = "Telegram"
-regex = telegram_token_regex
+api = GitHubAPI()
+
+print("Loading credentials from ", credentials_file)
+
+api.load_credentials(credentials_file)
+api.authenticate()
 
 print("Search query:", query)
 print("Regex:", regex)
 
-repositories = search(q=query, sort="updated", order="desc")
+repositories = search(q=query, sort="updated", order="desc", api=api)
 
 print("Found", len(repositories), "repos")
 
@@ -28,4 +36,6 @@ for repo in repositories:
         for file_ in files:
             print("File", file_.filename)
             results = regex.search(file_.read())
-            print(results)
+            if results is not None:
+                print(results)
+                input()
