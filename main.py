@@ -63,7 +63,7 @@ for repo in repositories:
                     break
             for el in forbidden_suffixes:
                 if file_.filename.endswith(el):
-                    skip = False
+                    skip = True
                     break
 
             if skip:
